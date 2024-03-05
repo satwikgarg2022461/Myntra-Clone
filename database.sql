@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS customer (
   city VARCHAR(50) NOT NULL,
   state VARCHAR(2) NOT NULL,
   postal_code VARCHAR(10) NOT NULL,
-  country VARCHAR(50) NOT NULL,
-  UNIQUE (address_line1, city, state, postal_code, country)
+  country VARCHAR(50) NOT NULL
+--   UNIQUE (address_line1, city, state, postal_code, country)
 );
 
 
@@ -284,6 +284,109 @@ INSERT INTO distributor_history (distributor_id, product_id, quantity, transacti
 (5, 10, 1,10);
 
 SELECT * FROM distributor_history;
+
+
+-- 1. Retrieve the names of customers who have purchased products with a price higher than $60
+SELECT c.name
+FROM customer c
+WHERE EXISTS (
+    SELECT 1
+    FROM transaction t
+    JOIN product p ON t.product_id = p.product_id
+    WHERE t.customer_id = c.customer_id
+    AND p.price > 60
+);
+
+
+-- 2. Retrieve the names and addresses of distributors who have sold more than 3 products in total
+SELECT d.name, d.address_line1, d.city, d.state, d.postal_code, d.country
+FROM distributor d
+JOIN (
+    SELECT distributor_id, SUM(quantity) AS total_sold
+    FROM transaction
+    GROUP BY distributor_id
+    HAVING total_sold > 3
+) AS t ON d.distributor_id = t.distributor_id;
+
+
+
+-- 3. Product with highest number of sales
+SELECT p.name AS product_name, SUM(t.quantity) AS total_sales
+FROM product p
+JOIN transaction t ON p.product_id = t.product_id
+GROUP BY p.product_id
+ORDER BY total_sales DESC
+LIMIT 1;
+
+
+-- 4. Distributor with highest number of sales
+SELECT d.name AS distributor_name, SUM(t.quantity) AS total_sales
+FROM distributor d
+JOIN transaction t ON d.distributor_id = t.distributor_id
+GROUP BY d.distributor_id
+ORDER BY total_sales DESC
+LIMIT 1;
+
+
+-- 5. Distributor with maximum stock
+SELECT d.name AS distributor_name, SUM(i.quantity) AS total_stock
+FROM distributor d
+JOIN inventory i ON d.distributor_id = i.distributor_id
+GROUP BY d.distributor_id
+ORDER BY total_stock DESC
+LIMIT 1;
+
+-- 6. Reading feedback
+SELECT f.*, p.name as product_name
+FROM Feedback f
+JOIN Product p ON f.product_id = p.product_id
+WHERE p.distributor_id = 1;
+
+-- 7. Retrieve the names and email addresses of customers who have purchased products from distributors in New York (NY)
+SELECT c.name, cc.email
+FROM customer c
+JOIN customer_contact cc ON c.customer_id = cc.customer_id
+WHERE EXISTS (
+    SELECT 1
+    FROM transaction t
+    JOIN distributor d ON t.distributor_id = d.distributor_id
+    WHERE t.customer_id = c.customer_id
+    AND d.state = 'NY'
+);
+
+
+-- 8. Retreiving data from Product Table where Distributor_id matches the required distributor
+-- then 
+-- Updating product data of selected product which belongs to 1 distributor
+SELECT product_id, name, description, quantity, price, Category
+FROM product
+WHERE distributor_id = 1;
+
+UPDATE product
+SET 
+    price = 75
+WHERE
+    product_id = 1
+    AND distributor_id = 1;
+
+SELECT * FROM product;
+
+
+-- 9. Calculate total sales for products by Category
+SELECT SUM(t.quantity) AS total_sales
+FROM Transaction t
+JOIN Product p ON t.product_id = p.product_id
+WHERE p.Category = 'Category 1';
+
+
+
+-- 10. Retrieve the names and quantities of products purchased by customers who live in Texas (TX)
+SELECT p.name, t.quantity
+FROM product p
+JOIN transaction t ON p.product_id = t.product_id
+JOIN customer c ON t.customer_id = c.customer_id
+WHERE c.state = 'TX';
+
 
 
 
