@@ -389,6 +389,18 @@ WHERE c.state = 'TX';
 
 
 
+-- WRONG SQL queries for showing constraints 
+INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES(1, 1, 2,1);
+INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES(NULL, '123 Main St.', 'Anytown', 'CA', '12345', 'USA');
+UPDATE product
+SET price = null
+WHERE product_id = 1;
+
+-- Correct SQL queries for showing constraints
+UPDATE product SET price = price * 1.1 WHERE name = 'Product 2';
+INSERT INTO product (distributor_id, name, description, quantity, price, Category)
+VALUES (1, 'Product 11', NULL, 50, 25, 'Category 1');
+
 
 
 
