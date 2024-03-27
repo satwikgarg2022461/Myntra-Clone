@@ -2,7 +2,7 @@ import urllib.parse
 import sqlalchemy
 from sqlalchemy import create_engine, text
 
-encoded_password = urllib.parse.quote_plus("Satwik@07")
+encoded_password = urllib.parse.quote_plus("root18")
 
 connection_string = f"mysql+pymysql://root:{encoded_password}@localhost:3306/myntra"
 

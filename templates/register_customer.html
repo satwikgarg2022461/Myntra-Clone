@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register Page</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        padding: 20px;
+        text-align: center;
+    }
+    .container {
+        background: #fff;
+        padding: 20px;
+        margin: auto;
+        width: 300px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+        color: #333;
+    }
+    .form-field {
+        margin-bottom: 10px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        display: block;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+    input[type="submit"] {
+        background-color: #ffa500;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: #e69500;
+    }
+    .login-link {
+        display: inline-block;
+        margin-top: 20px;
+        background-color: #e7e7e7;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <img 
+        class="Myntra-Logo-2011-img"
+        src="{{ url_for('static', filename='images/Myntra-Logo-2011.png') }}" 
+        alt="Myntra Logo"
+        style="max-width: 100px;">
+    <h2>Create An Account</h2>
+
+    <form action="/register" method="post"> <!-- Update action with your endpoint -->
+        <div class="form-field">
+            <input type="text" name="username" placeholder="ENTER YOUR USERNAME" required>
+        </div>
+        <div class="form-field">
+            <input type="email" name="email" placeholder="ENTER YOUR EMAIL" required>
+        </div>
+        <input type="submit" value="Create Account">
+    </form>
+
+    <a href="/login" class="login-link">Login</a> <!-- Update href with your login page link -->
+</div>
+
+</body>
+</html>
