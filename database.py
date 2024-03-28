@@ -8,9 +8,7 @@ connection_string = f"mysql+pymysql://root:{encoded_password}@localhost:3306/myn
 
 engine = create_engine(connection_string)
 
-
-
-def register(data):
+def register(data,database):
     with engine.connect() as conn:
         name = data.get("username")
         email = data.get("email")
@@ -20,15 +18,28 @@ def register(data):
         state = data.get("State")
         postal_code = data.get("Pincode")
         country = data.get("Country")
-        query = text('INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES (:name, :address_line1, :city, :state, :postal_code, :country)')
+        query = text(f'INSERT INTO {database} (name, address_line1, city, state, postal_code, country) VALUES (:name, :address_line1, :city, :state, :postal_code, :country)')
         result = conn.execute(query, {'name': name, 'address_line1': address_line1, 'city': city, 'state': state, 'postal_code': postal_code, 'country': country})
         conn.commit()
         result1 = conn.execute(text("SELECT * FROM customer"))
         print(result1.fetchall())
-        
+
+def login_check(data,database):
+    with engine.connect() as conn:
+        name = data.get("username")
+        email = data.get("email")
+        query = text(f'SELECT c.{database}_id FROM {database} c JOIN {database}_contact cc ON c.{database}_id = cc.{database}_id WHERE c.name = "{name}" AND cc.email = "{email}";')
+        result = conn.execute(query)
+        conn.commit()
+        fetched_result = result.fetchone()
+        if fetched_result:
+            database_id = fetched_result[0]
+            print(database_id)
+        else:
+            print("No matching record found")
 
 def dispaly():
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM customer"))
         print(result.fetchall())  
-
+        result = conn.execute(text("SELECT * FROM customer"))
+        print(result.fetchall())

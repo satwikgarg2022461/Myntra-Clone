@@ -57,9 +57,9 @@
         text-decoration: none;
         border-radius: 5px;
       }
-      .form-field-two-box {
+      /* .form-field-two-box {
         width: ;
-      }
+      } */
     </style>
   </head>
   <body>
@@ -71,7 +71,7 @@
         style="max-width: 100px" />
       <h2>Create An Account</h2>
 
-      <form action="/submit-register" method="post">
+      <form action="/{{name}}-submit-register" method="post">
         <div class="form-field">
           <input type="text" name="username" placeholder="Name" required />
         </div>
