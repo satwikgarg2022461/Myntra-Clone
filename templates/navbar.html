@@ -22,6 +22,7 @@
             justify-content: space-between;
             align-items: center;
             margin: 0 auto;
+            height: 50px;
         }
 
         .account, .wallet {
@@ -57,15 +58,30 @@
         nav a:hover {
             color: #333;
         }
+        .icon{
+            padding: 10px;
+            text-align: center;
+        }
+        .icon a,
+        .icon p{
+            margin: 0px;
+            padding: 0px;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <a href="#"><img class="logo" src="{{ url_for('static', filename='images/Myntra-Logo-2011.png') }}" alt="logo"></a>
+            <a href={{home}}><img class="logo" src="{{ url_for('static', filename='images/Myntra-Logo-2011.png') }}" alt="logo"></a>
             <nav>
-                <a href="#"><i class="fa-solid fa-user account"></i></a>
-                <a href="#"><i class="fa-solid fa-wallet wallet"></i></a>
+                <div class="icon">
+                    <a href="register"><i class="fa-solid fa-user account"></i></a>
+                    <p>Account</p>
+                </div>
+                <div class="icon">
+                    <a href="#"><i class="fa-solid fa-wallet wallet"></i></a>
+                    <p>  Wallet</p>
+                </div>
             </nav>
         </div>
     </header>
