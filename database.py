@@ -22,9 +22,10 @@ def register(data):
         country = data.get("Country")
         query = text('INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES (:name, :address_line1, :city, :state, :postal_code, :country)')
         result = conn.execute(query, {'name': name, 'address_line1': address_line1, 'city': city, 'state': state, 'postal_code': postal_code, 'country': country})
+        conn.commit()
         result1 = conn.execute(text("SELECT * FROM customer"))
         print(result1.fetchall())
-
+        
 
 def dispaly():
     with engine.connect() as conn:
