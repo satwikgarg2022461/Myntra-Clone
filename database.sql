@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS customer (
   state VARCHAR(2) NOT NULL,
   postal_code VARCHAR(10) NOT NULL,
   country VARCHAR(50) NOT NULL,
-  UNIQUE (address_line1, city, state, postal_code, country)
+  UNIQUE (name, address_line1, city, state, postal_code, country)
 );
+
 
 
 CREATE TABLE IF NOT EXISTS customer_contact (
@@ -28,7 +29,7 @@ CREATE TABLE IF NOT EXISTS distributor(
   state VARCHAR(2) NOT NULL,
   postal_code VARCHAR(10) NOT NULL,
   country VARCHAR(50) NOT NULL,
-  UNIQUE (address_line1, city, state, postal_code, country)
+  UNIQUE (name, address_line1, city, state, postal_code, country)
 );
 
 
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS distributor_contact (
 );
 
 
-INSERT IGNORE INTO customer (name, address_line1, city, state, postal_code, country) VALUES
+INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES
 ('John Doe', '123 Main St.', 'Anytown', 'CA', '12345', 'USA'),
 ('Jane Smith', '456 Maple Ave.', 'Springfield', 'MA', '67890', 'USA'),
 ('Michael Brown', '789 Elm St.', 'Metropolis', 'NY', '09876', 'USA'),
@@ -59,7 +60,7 @@ INSERT IGNORE INTO customer (name, address_line1, city, state, postal_code, coun
 
 
 
-INSERT IGNORE INTO customer_contact (phone_number, email, customer_id) VALUES
+INSERT INTO customer_contact (phone_number, email, customer_id) VALUES
 ('555-123-4567', 'john.doe@example.com', 1),
 ('555-555-5555', 'jane.smith@example.com', 2),
 ('555-345-6789', 'alice.johnson@example.com', 3),
@@ -71,7 +72,10 @@ INSERT IGNORE INTO customer_contact (phone_number, email, customer_id) VALUES
 ('555-098-7654', 'jennifer.davis@example.com', 9),
 ('555-678-5432', 'charles.taylor@example.com', 10);
 
-
+-- SELECT c.customer_id
+-- FROM customer c
+-- JOIN customer_contact cc ON c.customer_id = cc.customer_id
+-- WHERE c.name = 'Jane Smith' AND cc.email = 'jane.smith@example.com';
 
 Select * from customer_contact;
 SELECT * from customer;
@@ -110,17 +114,21 @@ SELECT * FROM distributor_contact;
 
 
 CREATE TABLE IF NOT EXISTS product (
-    product_id INT AUTO_INCREMENT PRIMARY KEY,
-    distributor_id INT NOT NULL,
-    name VARCHAR(20) NOT NULL,
-    description VARCHAR(100),
-    quantity INT NOT NULL,
-    price INT NOT NULL,
-    Category VARCHAR(20) NOT NULL,
-    FOREIGN KEY (distributor_id) REFERENCES distributor(distributor_id) ON DELETE CASCADE
+  product_id INT AUTO_INCREMENT PRIMARY KEY,
+  distributor_id INT NOT NULL,
+  name VARCHAR(20) NOT NULL,
+  description VARCHAR(100),
+  quantity INT NOT NULL,
+  price INT NOT NULL,
+  category VARCHAR(20) NOT NULL,
+  INDEX idx_product_distributor (product_id, distributor_id), -- Adding index for the foreign key
+  FOREIGN KEY (distributor_id) REFERENCES distributor(distributor_id) ON DELETE CASCADE
 );
 
-INSERT IGNORE INTO product (distributor_id, name, description, quantity, price, Category)VALUES
+
+
+
+INSERT INTO product (distributor_id, name, description, quantity, price, Category)VALUES
 (1, 'Product 1', 'Description for Product 1', 100, 50, 'Category 1'),
 (1, 'Product 2', 'Description for Product 2', 80, 70, 'Category 2'),
 (2, 'Product 3', 'Description for Product 3', 120, 40, 'Category 1'),
@@ -134,6 +142,21 @@ INSERT IGNORE INTO product (distributor_id, name, description, quantity, price, 
 
 SELECT * from product;
 
+-- SELECT d.distributor_id, d.name , d.address_line1, d.city, d.state, d.postal_code, d.country,
+--        p.product_id, p.name 
+-- FROM distributor d
+-- JOIN product p ON d.distributor_id = p.distributor_id
+-- WHERE d.distributor_id = 1;
+
+-- SELECT c.customer_id, c.name AS customer_name, c.address_line1, c.city, c.state, c.postal_code, c.country,
+--        cc.phone_number, cc.email,
+--        f.review,
+--        p.product_id, p.name AS product_name
+-- FROM customer c
+-- LEFT JOIN customer_contact cc ON c.customer_id = cc.customer_id
+-- LEFT JOIN Feedback f ON c.customer_id = f.customer_id
+-- LEFT JOIN product p ON f.product_id = p.product_id;
+
 CREATE TABLE IF NOT EXISTS Feedback (
     product_id INT NOT NULL,
     customer_id INT NOT NULL,
@@ -143,10 +166,11 @@ CREATE TABLE IF NOT EXISTS Feedback (
     PRIMARY KEY(product_id,customer_id)    
 );
 
-INSERT IGNORE INTO Feedback (product_id, customer_id, review) VALUES
+
+INSERT INTO Feedback (product_id, customer_id, review) VALUES
 (1, 1, 'Great product! Highly recommended.'), -- John Doe reviews Product 1
 (2, 2, 'Excellent quality. Will buy again.'), -- Jane Smith reviews Product 2
-(3, 3, 'Impressed with the functionality.'), -- Michael Brown reviews Product 3
+(2, 3, 'Impressed with the functionality.'), -- Michael Brown reviews Product 3
 (4, 4, 'Good value for money.'), -- Emily Jones reviews Product 4
 (5, 5, 'Fast shipping. Very satisfied.'), -- David Miller reviews Product 5
 (6, 6, 'Beautiful design. Love it!'), -- Sarah Anderson reviews Product 6
@@ -157,6 +181,16 @@ INSERT IGNORE INTO Feedback (product_id, customer_id, review) VALUES
 
 SELECT * from Feedback;
 
+-- SELECT f.product_id, f.review, 
+-- FROM Feedback f
+-- JOIN product p ON f.product_id = p.product_id
+-- WHERE p.distributor_id = 1;
+
+-- SELECT f.review, p.product_id, p.name, p.description, p.quantity, p.price, p.Category, c.customer_id, c.name
+-- FROM Feedback f
+-- JOIN product p ON f.product_id = p.product_id
+-- JOIN Customer c ON f.customer_id = c.customer_id
+-- WHERE p.distributor_id = 1;
 
 
 -- Step 4: Create Weak Entity Set - Cart
@@ -174,7 +208,7 @@ CREATE TABLE IF NOT EXISTS cart (
 
 
 -- Inserting data into Cart table
-INSERT IGNORE INTO cart (customer_id, product_id, quantity, distributor_id)
+INSERT INTO cart (customer_id, product_id, quantity, distributor_id)
 VALUES
     (1, 1, 2, 1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
     (2, 2, 1, 1), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
@@ -198,31 +232,40 @@ CREATE TABLE IF NOT EXISTS inventory (
     PRIMARY KEY(distributor_id,product_id)
 );
 
-INSERT IGNORE INTO inventory (distributor_id, product_id, quantity)
-SELECT distributor_id, product_id, quantity FROM product;
+
+
+
+CREATE TRIGGER add_to_inventory_after_insert
+AFTER INSERT ON product
+FOR EACH ROW
+BEGIN
+    INSERT INTO inventory (distributor_id, product_id, quantity)
+    VALUES (NEW.distributor_id, NEW.product_id, NEW.quantity);
+END;
+
 
 
 SELECT * from inventory;
 
 
+-- Create the transaction table
 CREATE TABLE IF NOT EXISTS transaction (
-    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
-    product_id INT NOT NULL,
-    customer_id INT NOT NULL,
-    distributor_id INT NOT NULL,
-    quantity INT NOT NULL,
-    INDEX customer_history_idx (transaction_id,product_id, customer_id),
-    INDEX distributor_history_idx (transaction_id,product_id, distributor_id),
-    date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    date_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id, customer_id, distributor_id) REFERENCES cart (product_id, customer_id, distributor_id) ON DELETE CASCADE,
-    UNIQUE(transaction_id,product_id,customer_id,distributor_id)
-
-    -- INDEX cart_idx (product_id, customer_id, distributor_id) -- Adding this index definition to explicitly use the existing composite index
+  transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  customer_id INT NOT NULL,
+  distributor_id INT NOT NULL,
+  quantity INT NOT NULL,
+  date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  date_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id, distributor_id) REFERENCES product(product_id, distributor_id) ON DELETE CASCADE,
+  FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
+  INDEX customer_history_idx (transaction_id, product_id, customer_id),
+  INDEX distributor_history_idx (transaction_id, product_id, distributor_id),
+  UNIQUE(transaction_id, product_id, customer_id, distributor_id)
 );
 
 
-INSERT IGNORE INTO transaction (customer_id, product_id, quantity, distributor_id) VALUES
+INSERT INTO transaction (customer_id, product_id, quantity, distributor_id) VALUES
 (1, 1, 2, 1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
 (2, 2, 1, 1), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
 (3, 3, 3, 2), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
@@ -248,17 +291,25 @@ CREATE TABLE IF NOT EXISTS customer_history(
     PRIMARY KEY(transaction_id,product_id,customer_id)
 );
 
-INSERT IGNORE INTO customer_history (customer_id, product_id, quantity, transaction_id) VALUES
-(1, 1, 2,1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
-(2, 2, 1,2), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
-(3, 3, 3,3), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
-(4, 4, 2,4), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
-(5, 5, 1,5), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
-(6, 6, 2,6), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
-(7, 7, 1,7), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
-(8, 8, 3,8), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
-(9, 9, 2,9), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
-(10, 10, 1,10);
+-- INSERT INTO customer_history (customer_id, product_id, quantity, transaction_id) VALUES
+-- -- (1, 1, 2,1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
+-- (2, 2, 1,2), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
+-- (3, 3, 3,3), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
+-- (4, 4, 2,4), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
+-- (5, 5, 1,5), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
+-- (6, 6, 2,6), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
+-- (7, 7, 1,7), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
+-- (8, 8, 3,8), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
+-- (9, 9, 2,9), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
+-- (10, 10, 1,10);
+
+CREATE TRIGGER add_to_customer_history AFTER INSERT ON transaction
+FOR EACH ROW
+BEGIN
+    INSERT INTO customer_history (transaction_id, product_id, quantity, customer_id)
+    VALUES (NEW.transaction_id, NEW.product_id, NEW.quantity, NEW.customer_id);
+END;
+
 
 SELECT * FROM customer_history;
 
@@ -271,19 +322,41 @@ CREATE TABLE IF NOT EXISTS distributor_history(
     PRIMARY KEY(transaction_id,product_id,distributor_id)
 );
 
-INSERT IGNORE INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES
-(1, 1, 2,1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
-(1, 2, 1,2), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
-(2, 3, 3,3), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
-(2, 4, 2,4), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
-(3, 5, 1,5), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
-(3, 6, 2,6), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
-(4, 7, 1,7), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
-(4, 8, 3,8), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
-(5, 9, 2,9), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
-(5, 10, 1,10);
+-- INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES
+-- (1, 1, 2,1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
+-- (1, 2, 1,2), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
+-- (2, 3, 3,3), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
+-- (2, 4, 2,4), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
+-- (3, 5, 1,5), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
+-- (3, 6, 2,6), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
+-- (4, 7, 1,7), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
+-- (4, 8, 3,8), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
+-- (5, 9, 2,9), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
+-- (5, 10, 1,10);
 
--- SELECT * FROM distributor_history; 
+CREATE TRIGGER add_to_distributor_history AFTER INSERT ON transaction
+FOR EACH ROW
+BEGIN
+    INSERT INTO distributor_history (transaction_id, product_id, quantity, distributor_id)
+    VALUES (NEW.transaction_id, NEW.product_id, NEW.quantity, NEW.distributor_id);
+END;
+
+
+SELECT * FROM distributor_history;
+
+
+SELECT * FROM cart;
+
+
+
+
+
+
+
+
+
+
+
 
 -- 1. Retrieve the names of customers who have purchased products with a price higher than $60
 SELECT c.name
@@ -386,20 +459,67 @@ JOIN transaction t ON p.product_id = t.product_id
 JOIN customer c ON t.customer_id = c.customer_id
 WHERE c.state = 'TX';
 
--- delete from feedback where customer_id = 1;
--- select * from feedback;
 
--- select * from customer_history where quantity >= 3;
 
-select * from customer_contact;
+-- WRONG SQL queries for showing constraints 
+INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES(1, 1, 2,1);
+INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES(NULL, '123 Main St.', 'Anytown', 'CA', '12345', 'USA');
+UPDATE product
+SET price = null
+WHERE product_id = 1;
+
+-- Correct SQL queries for showing constraints
+UPDATE product SET price = price * 1.1 WHERE name = 'Product 2';
+INSERT INTO product (distributor_id, name, description, quantity, price, Category)
+VALUES (1, 'Product 11', NULL, 50, 25, 'Category 1');
+
+
+SELECT * FROM customer;
+SELECT * FROM distributor;
+
 -- DROP TABLE distributor_history;
---  DROP TABLE customer_history;
---  DROP TABLE transaction;
---  DROP TABLE cart;
---  DROP TABLE Feedback;
---  DROP TABLE inventory;
---  DROP TABLE product;
---  DROP TABLE customer_contact;
---  DROP TABLE customer;
---  DROP TABLE distributor_contact;
---  DROP TABLE distributor;
+-- DROP TABLE customer_history;
+-- DROP TABLE transaction;
+-- DROP TABLE cart;
+-- DROP TABLE Feedback;
+-- DROP TABLE inventory;
+-- DROP TABLE product;
+-- DROP TABLE customer_contact;
+-- DROP TABLE customer;
+-- DROP TABLE distributor_contact;
+-- DROP TABLE distributor;
+
+
+
+START TRANSACTION;
+
+-- Insert into transaction table
+INSERT INTO transaction (product_id, customer_id, distributor_id, quantity)
+SELECT c.product_id, c.customer_id, c.distributor_id, c.quantity
+FROM cart c
+WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+
+-- Insert into customer_history table
+INSERT INTO customer_history (transaction_id, product_id, quantity, customer_id)
+SELECT t.transaction_id, t.product_id, t.quantity, t.customer_id
+FROM transaction t
+WHERE t.customer_id =1; -- Replace <customer_id> with the actual customer_id
+
+-- Update product table to reduce quantity
+UPDATE product p
+INNER JOIN cart c ON p.product_id = c.product_id
+SET p.quantity = p.quantity - c.quantity
+WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+
+-- Update inventory table to reduce quantity
+UPDATE inventory i
+INNER JOIN cart c ON i.product_id = c.product_id AND i.distributor_id = c.distributor_id
+SET i.quantity = i.quantity - c.quantity
+WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+
+DELETE FROM cart
+WHERE customer_id = 1;
+
+COMMIT;
+
+
