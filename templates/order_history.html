@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Itim&family=Lobster&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet" />
+    <style>
+      .heading {
+        padding-left: 30px;
+        text-align: center;
+      }
+      .container {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 20px;
+      }
+
+      .image img {
+        width: 150px;
+        height: 150px;
+        padding: 10px;
+        padding-left: 30px;
+      }
+      .image p {
+        padding-left: 30px;
+      }
+
+      .product-info {
+        margin-top: 10px;
+        padding: 20px;
+        text-align: center;
+        font-family: "Itim", cursive;
+        font-weight: 400;
+        font-style: normal;
+        flex: 1;
+      }
+
+      .feedback {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .form-field {
+        margin-bottom: 10px;
+      }
+
+      input[type="text"] {
+        width: 150px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      input[type="submit"] {
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'customer_home_navbar.html' %}
+    <!-- Your navigation bar code here -->
+    <h2 class="heading">Your Orders</h2>
+    {% for i in order_details %}
+    <div class="container">
+      <div class="image">
+        <p>{{ i['order_date'] }}</p>
+        <img
+          src="{{ url_for('static', filename='images/' ~ i['product_id'] ~ '.jpg') }}"
+          alt="product_photo" />
+      </div>
+      <div class="product-info">
+        <p>{{ i['product_name'] }}</p>
+        <p>QTY:{{ i['quantity'] }}</p>
+        <p>Total:{{ i['quantity']*i['price'] }}</p>
+      </div>
+      <div class="feedback">
+        <form
+          action="/customer/add-feedback?product_id={{i['product_id']}}"
+          method="post">
+          <div class="form-field">
+            <input
+              type="text"
+              name="feedback"
+              placeholder="Feedback"
+              required />
+          </div>
+          <input type="submit" value="Submit" />
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </body>
+</html>

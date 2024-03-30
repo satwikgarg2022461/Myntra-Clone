@@ -139,9 +139,10 @@
             <p>DELIVER  - NEW DELHI</p>
             <h2>IN STOCK</h2>
             <div class="button-container">
-                <a href="/customer/products"><button class="button">Buy Now</button></a>
-                <a href="/customer/products"><button class="button">ADD TO CART</button></a>
-            </div>
+                <a href="/customer/transaction"><button class="button">Buy Now</button></a>
+                <a href="/customer/cart_add?product_id={{ product_data['product_id'] }}&distribution_id={{ product_data['distributor_id'] }}">
+                  <button class="button">ADD TO CART</button>
+                </a>
             <h2>PRODUCT REVIEW</h2>
             <div class="feedback">
                 {% for item in feedback_data %}

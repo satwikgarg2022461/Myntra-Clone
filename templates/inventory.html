@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Itim&family=Lobster&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet" />
+  </head>
+  <style>
+    .title {
+      background-color: white;
+      border: none;
+      font-weight: bold;
+      padding: 5px;
+      font-family: "Poppins", sans-serif;
+      font-weight: 500;
+      font-style: normal;
+    }
+
+    .poppins-medium {
+      font-family: "Poppins", sans-serif;
+      font-weight: 500;
+      font-style: normal;
+    }
+    .image img {
+      padding: 5px;
+      width: 100px;
+      height: 100px;
+    }
+    .table {
+      width: 100%;
+      border: none;
+    }
+    .items {
+      margin-top: 5px;
+      padding: 5px;
+      align-items: center;
+      text-align: center;
+    }
+  </style>
+  <body>
+    {% include 'deller_navbar.html'%}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col"><p class="title">ID</p></th>
+          <th scope="col"><p class="title">Product</p></th>
+          <th scope="col"><p class="title">Category</p></th>
+          <th scope="col"><p class="title">Price</p></th>
+          <th scope="col"><p class="title">Description</p></th>
+          <th scope="col"><p class="title">Stock Left</p></th>
+        </tr>
+      </thead>
+      {% for i in inventory_data: %}
+      <tbody class="items">
+        <tr>
+          <th scope="row">{{i['product_id']}}</th>
+          <td>
+            <div class="image">
+              <img
+                src="{{ url_for('static', filename='images/' ~ i['product_id'] ~ '.jpg') }}"
+                alt="product image" />
+              <p>{{i['name']}}</p>
+            </div>
+          </td>
+          <td>{{i['category']}}</td>
+          <td>{{i['price']}}</td>
+          <td>{{i['description']}}</td>
+          <td>{{i['quantity']}}</td>
+        </tr>
+      </tbody>
+      {% endfor %}
+    </table>
+  </body>
+</html>
