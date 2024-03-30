@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Product</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        padding: 20px;
+        text-align: center;
+      }
+      .container {
+        background: #fff;
+        padding: 20px;
+        margin-top: 50px;
+        margin-left: 570px;
+        /* margin: 10px auto; Updated to center horizontally */
+        width: 350px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        color: #948a5b;
+      }
+      .form-field {
+        margin-bottom: 10px;
+        width: 327px;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        display: block;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+      input[type="submit"] {
+        background-color: #948a5b;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #e69500;
+      }
+      .login-link {
+        display: inline-block;
+        margin-top: 20px;
+        background-color: #e7e7e7;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      /* .form-field-two-box {
+        width: ;
+      } */
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <img
+        class="logo"
+        src="{{ url_for('static', filename='images/Myntra-Logo-2011.png') }}"
+        alt="Myntra Logo"
+        style="max-width: 100px" />
+      <h2>Add a Product</h2>
+
+      <form action="/deller/submit-product" method="post">
+        <div class="form-field">
+          <input type="text" name="name" placeholder="Name" required />
+        </div>
+        <div class="form-field">
+          <input
+            type="text"
+            name="description"
+            placeholder="Description"
+            required />
+        </div>
+        <div class="form-field">
+          <input type="text" name="quantity" placeholder="Quantity" required />
+        </div>
+        <div class="form-field">
+          <input type="text" name="price" placeholder="Price" required />
+        </div>
+        <div class="form-field">
+          <input type="text" name="category" placeholder="Category" required />
+        </div>
+        <input type="submit" value="Create Account" />
+      </form>
+    </div>
+  </body>
+</html>

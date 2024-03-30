@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
-from database import register,dispaly, login_check, product_list, fetch_product_data
+from database import register,dispaly, login_check, product_list, fetch_product_data,add_product
+from GlobalData import set_customer_id,set_deller_id,get_customer_id,get_deller_id
 
 app = Flask(__name__)
 
@@ -46,7 +47,11 @@ def  sign_deller_in():
 def customer_submit_sign_in():
     if request.method == 'POST':
         data = request.form
-        login_check(data,'customer')
+        id = login_check(data,'customer')
+        if(id == -1):
+            return "Wrong login details"
+        else:
+            set_customer_id = id
         # dispaly()
         return redirect(url_for('customer_home'))
 
@@ -54,7 +59,12 @@ def customer_submit_sign_in():
 def deller_submit_sign_in():
     if request.method == 'POST':
         data = request.form
-        login_check(data,'deller')
+        id=login_check(data,'distributor')
+        if(id == -1):
+            return "Wrong login details"
+        else:
+            set_deller_id(id)
+            get_deller_id()
         # dispaly()
         return redirect(url_for('deller_home'))
 
@@ -103,6 +113,19 @@ def product_detail(product_id):
     # Fetch product details based on the product_id from the database
     product_data,feedback_data = fetch_product_data(product_id)
     return render_template('product_individual_page.html',product_data=product_data,feedback_data = feedback_data)
+
+@app.route("/deller/add-product", methods=["GET"])
+def  add_product_page():
+    return render_template('add_product.html')
+
+
+@app.route('/deller/submit-product', methods=['POST'])
+def deller_add_product_form():
+    if request.method == 'POST':
+        data = request.form
+        add_product(data)
+        dispaly()
+        return redirect(url_for('deller_home'))
 
 
 if(__name__ == "__main__"):

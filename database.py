@@ -1,6 +1,7 @@
 import urllib.parse
 import sqlalchemy
 from sqlalchemy import create_engine, text
+from GlobalData import get_deller_id
 
 encoded_password = urllib.parse.quote_plus("Satwik@07")
 
@@ -41,13 +42,13 @@ def login_check(data,database):
         fetched_result = result.fetchone()
         if fetched_result:
             database_id = fetched_result[0]
-            print(database_id)
+            return database_id
         else:
-            print("No matching record found")
+            return -1
 
 def dispaly():
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM customer"))
+        result = conn.execute(text("SELECT * FROM product"))
         print(result.fetchall())
 
 def product_list():
@@ -93,4 +94,18 @@ def fetch_product_data(product_id):
             }
         return product_dict,feedback_data
 
-fetch_product_data(2)
+# fetch_product_data(2)
+
+def add_product(data):
+    with engine.connect() as conn:
+        name = data.get("name")
+        description = data.get("description")
+        quantity = int(data.get("quantity"))
+        price = int(data.get("price"))
+        category = (data.get("category"))
+        distribution_id = get_deller_id()
+        query = text(f'INSERT INTO product (distributor_id, name, description, quantity, price, Category)VALUES ({distribution_id}, "{name}", "{description}", "{quantity}", "{price}", "{category}");')
+        result = conn.execute(query)
+        conn.commit()
+        dispaly()
+        
