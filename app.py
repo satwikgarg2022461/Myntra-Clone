@@ -77,7 +77,7 @@ def customer_submit_form():
     if request.method == 'POST':
         data = request.form
         register(data,'customer')
-        dispaly()
+        # dispaly()
         return redirect(url_for('sign_customer_in'))
         
 
@@ -86,7 +86,7 @@ def deller_submit_form():
     if request.method == 'POST':
         data = request.form
         register(data,'distributor')
-        dispaly()
+        # dispaly()
         return redirect(url_for('sign_deller_in'))
         
 
@@ -124,7 +124,7 @@ def deller_add_product_form():
     if request.method == 'POST':
         data = request.form
         add_product(data)
-        dispaly()
+        # dispaly()
         return redirect(url_for('deller_home'))
 
 @app.route('/deller/inventory')
@@ -177,11 +177,11 @@ def customer_cart_add():
 @app.route('/customer/order_history',methods=['GET'])
 def customer_order_history():
     order_details = fetch_order_history()
+    print(order_details)
     return render_template('order_history.html',order_details=order_details)
 
 @app.route('/customer/add-feedback',methods=['POST'])
 def customer_add_feedback():
-    
     print("apphi")
     review = request.form
     product_id = request.args.get('product_id')

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS customer (
 );
 
 
+SELECT * from customer;
 
 CREATE TABLE IF NOT EXISTS customer_contact (
   customer_id INT NOT NULL ,
@@ -207,23 +208,6 @@ CREATE TABLE IF NOT EXISTS cart (
 );
 
 
--- Inserting data into Cart table
-INSERT INTO cart (customer_id, product_id, quantity, distributor_id)
-VALUES
-    (1, 1, 2, 1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
-    (2, 2, 1, 1), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
-    (3, 3, 3, 2), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
-    (4, 4, 2, 2), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
-    (5, 5, 1, 3), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
-    (6, 6, 2, 3), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
-    (7, 7, 1, 4), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
-    (8, 8, 3, 4), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
-    (9, 9, 2, 5), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
-    (10, 10, 1, 5); -- Jennifer Garcia adds 1 quantity of Product 10 from Distributor 10 to the cart
-
-SELECT * from cart;
-
-
 CREATE TABLE IF NOT EXISTS inventory (
     distributor_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -243,6 +227,25 @@ BEGIN
     VALUES (NEW.distributor_id, NEW.product_id, NEW.quantity);
 END;
 
+-- Inserting data into Cart table
+INSERT INTO cart (customer_id, product_id, quantity, distributor_id)
+VALUES
+    (1, 1, 2, 1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
+    (2, 2, 1, 1), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
+    (3, 3, 3, 2), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
+    (4, 4, 2, 2), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
+    (5, 5, 1, 3), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
+    (6, 6, 2, 3), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
+    (7, 7, 1, 4), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
+    (8, 8, 3, 4), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
+    (9, 9, 2, 5), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
+    (10, 10, 1, 5); -- Jennifer Garcia adds 1 quantity of Product 10 from Distributor 10 to the cart
+
+SELECT * from cart;
+
+
+
+
 
 
 SELECT * from inventory;
@@ -260,26 +263,9 @@ CREATE TABLE IF NOT EXISTS transaction (
   FOREIGN KEY (product_id, distributor_id) REFERENCES product(product_id, distributor_id) ON DELETE CASCADE,
   FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE,
   INDEX customer_history_idx (transaction_id, product_id, customer_id),
-  INDEX distributor_history_idx (transaction_id, product_id, distributor_id),
-  UNIQUE(transaction_id, product_id, customer_id, distributor_id)
+  INDEX distributor_history_idx (transaction_id, product_id, distributor_id)
+--   UNIQUE(transaction_id, product_id, customer_id, distributor_id)
 );
-
-
-INSERT INTO transaction (customer_id, product_id, quantity, distributor_id) VALUES
-(1, 1, 2, 1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
-(2, 2, 1, 1), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
-(3, 3, 3, 2), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
-(4, 4, 2, 2), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
-(5, 5, 1, 3), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
-(6, 6, 2, 3), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
-(7, 7, 1, 4), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
-(8, 8, 3, 4), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
-(9, 9, 2, 5), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
-(10, 10, 1, 5); -- Jennifer Garcia adds 1 quantity of Product 10 from Distributor 10 to the cart
-
-
-SELECT * from transaction;
-
 
 
 CREATE TABLE IF NOT EXISTS customer_history(
@@ -291,17 +277,7 @@ CREATE TABLE IF NOT EXISTS customer_history(
     PRIMARY KEY(transaction_id,product_id,customer_id)
 );
 
--- INSERT INTO customer_history (customer_id, product_id, quantity, transaction_id) VALUES
--- -- (1, 1, 2,1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
--- (2, 2, 1,2), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
--- (3, 3, 3,3), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
--- (4, 4, 2,4), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
--- (5, 5, 1,5), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
--- (6, 6, 2,6), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
--- (7, 7, 1,7), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
--- (8, 8, 3,8), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
--- (9, 9, 2,9), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
--- (10, 10, 1,10);
+
 
 CREATE TRIGGER add_to_customer_history AFTER INSERT ON transaction
 FOR EACH ROW
@@ -322,17 +298,6 @@ CREATE TABLE IF NOT EXISTS distributor_history(
     PRIMARY KEY(transaction_id,product_id,distributor_id)
 );
 
--- INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES
--- (1, 1, 2,1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
--- (1, 2, 1,2), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
--- (2, 3, 3,3), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
--- (2, 4, 2,4), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
--- (3, 5, 1,5), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
--- (3, 6, 2,6), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
--- (4, 7, 1,7), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
--- (4, 8, 3,8), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
--- (5, 9, 2,9), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
--- (5, 10, 1,10);
 
 CREATE TRIGGER add_to_distributor_history AFTER INSERT ON transaction
 FOR EACH ROW
@@ -340,6 +305,24 @@ BEGIN
     INSERT INTO distributor_history (transaction_id, product_id, quantity, distributor_id)
     VALUES (NEW.transaction_id, NEW.product_id, NEW.quantity, NEW.distributor_id);
 END;
+
+
+INSERT INTO transaction (customer_id, product_id, quantity, distributor_id) VALUES
+(1, 1, 2, 1), -- John Doe adds 2 quantity of Product 1 from Distributor 1 to the cart
+(2, 2, 1, 1), -- Jane Smith adds 1 quantity of Product 3 from Distributor 2 to the cart
+(3, 3, 3, 2), -- Michael Brown adds 3 quantity of Product 5 from Distributor 3 to the cart
+(4, 4, 2, 2), -- Emily Jones adds 2 quantity of Product 7 from Distributor 4 to the cart
+(5, 5, 1, 3), -- David Miller adds 1 quantity of Product 9 from Distributor 5 to the cart
+(6, 6, 2, 3), -- Sarah Anderson adds 2 quantity of Product 2 from Distributor 6 to the cart
+(7, 7, 1, 4), -- William Davis adds 1 quantity of Product 4 from Distributor 7 to the cart
+(8, 8, 3, 4), -- Elizabeth Wilson adds 3 quantity of Product 6 from Distributor 8 to the cart
+(9, 9, 2, 5), -- Richard Wright adds 2 quantity of Product 8 from Distributor 9 to the cart
+(10, 10, 1, 5); -- Jennifer Garcia adds 1 quantity of Product 10 from Distributor 10 to the cart
+
+
+SELECT * from transaction;
+
+
 
 
 SELECT * FROM distributor_history;
@@ -358,168 +341,168 @@ SELECT * FROM cart;
 
 
 
--- 1. Retrieve the names of customers who have purchased products with a price higher than $60
-SELECT c.name
-FROM customer c
-WHERE EXISTS (
-    SELECT 1
-    FROM transaction t
-    JOIN product p ON t.product_id = p.product_id
-    WHERE t.customer_id = c.customer_id
-    AND p.price > 60
-);
+-- -- 1. Retrieve the names of customers who have purchased products with a price higher than $60
+-- SELECT c.name
+-- FROM customer c
+-- WHERE EXISTS (
+--     SELECT 1
+--     FROM transaction t
+--     JOIN product p ON t.product_id = p.product_id
+--     WHERE t.customer_id = c.customer_id
+--     AND p.price > 60
+-- );
 
 
--- 2. Retrieve the names and addresses of distributors who have sold more than 3 products in total
-SELECT d.name, d.address_line1, d.city, d.state, d.postal_code, d.country
-FROM distributor d
-JOIN (
-    SELECT distributor_id, SUM(quantity) AS total_sold
-    FROM transaction
-    GROUP BY distributor_id
-    HAVING total_sold > 3
-) AS t ON d.distributor_id = t.distributor_id;
-
-
-
--- 3. Product with highest number of sales
-SELECT p.name AS product_name, SUM(t.quantity) AS total_sales
-FROM product p
-JOIN transaction t ON p.product_id = t.product_id
-GROUP BY p.product_id
-ORDER BY total_sales DESC
-LIMIT 1;
-
-
--- 4. Distributor with highest number of sales
-SELECT d.name AS distributor_name, SUM(t.quantity) AS total_sales
-FROM distributor d
-JOIN transaction t ON d.distributor_id = t.distributor_id
-GROUP BY d.distributor_id
-ORDER BY total_sales DESC
-LIMIT 1;
-
-
--- 5. Distributor with maximum stock
-SELECT d.name AS distributor_name, SUM(i.quantity) AS total_stock
-FROM distributor d
-JOIN inventory i ON d.distributor_id = i.distributor_id
-GROUP BY d.distributor_id
-ORDER BY total_stock DESC
-LIMIT 1;
-
--- 6. Reading feedback
-SELECT f.*, p.name as product_name
-FROM Feedback f
-JOIN Product p ON f.product_id = p.product_id
-WHERE p.distributor_id = 1;
-
--- 7. Retrieve the names and email addresses of customers who have purchased products from distributors in New York (NY)
-SELECT c.name, cc.email
-FROM customer c
-JOIN customer_contact cc ON c.customer_id = cc.customer_id
-WHERE EXISTS (
-    SELECT 1
-    FROM transaction t
-    JOIN distributor d ON t.distributor_id = d.distributor_id
-    WHERE t.customer_id = c.customer_id
-    AND d.state = 'NY'
-);
-
-
--- 8. Retreiving data from Product Table where Distributor_id matches the required distributor
--- then 
--- Updating product data of selected product which belongs to 1 distributor
-SELECT product_id, name, description, quantity, price, Category
-FROM product
-WHERE distributor_id = 1;
-
-UPDATE product
-SET 
-    price = 75
-WHERE
-    product_id = 1
-    AND distributor_id = 1;
-
-SELECT * FROM product;
-
-
--- 9. Calculate total sales for products by Category
-SELECT SUM(t.quantity) AS total_sales
-FROM Transaction t
-JOIN Product p ON t.product_id = p.product_id
-WHERE p.Category = 'Category 1';
+-- -- 2. Retrieve the names and addresses of distributors who have sold more than 3 products in total
+-- SELECT d.name, d.address_line1, d.city, d.state, d.postal_code, d.country
+-- FROM distributor d
+-- JOIN (
+--     SELECT distributor_id, SUM(quantity) AS total_sold
+--     FROM transaction
+--     GROUP BY distributor_id
+--     HAVING total_sold > 3
+-- ) AS t ON d.distributor_id = t.distributor_id;
 
 
 
--- 10. Retrieve the names and quantities of products purchased by customers who live in Texas (TX)
-SELECT p.name, t.quantity
-FROM product p
-JOIN transaction t ON p.product_id = t.product_id
-JOIN customer c ON t.customer_id = c.customer_id
-WHERE c.state = 'TX';
+-- -- 3. Product with highest number of sales
+-- SELECT p.name AS product_name, SUM(t.quantity) AS total_sales
+-- FROM product p
+-- JOIN transaction t ON p.product_id = t.product_id
+-- GROUP BY p.product_id
+-- ORDER BY total_sales DESC
+-- LIMIT 1;
+
+
+-- -- 4. Distributor with highest number of sales
+-- SELECT d.name AS distributor_name, SUM(t.quantity) AS total_sales
+-- FROM distributor d
+-- JOIN transaction t ON d.distributor_id = t.distributor_id
+-- GROUP BY d.distributor_id
+-- ORDER BY total_sales DESC
+-- LIMIT 1;
+
+
+-- -- 5. Distributor with maximum stock
+-- SELECT d.name AS distributor_name, SUM(i.quantity) AS total_stock
+-- FROM distributor d
+-- JOIN inventory i ON d.distributor_id = i.distributor_id
+-- GROUP BY d.distributor_id
+-- ORDER BY total_stock DESC
+-- LIMIT 1;
+
+-- -- 6. Reading feedback
+-- SELECT f.*, p.name as product_name
+-- FROM Feedback f
+-- JOIN Product p ON f.product_id = p.product_id
+-- WHERE p.distributor_id = 1;
+
+-- -- 7. Retrieve the names and email addresses of customers who have purchased products from distributors in New York (NY)
+-- SELECT c.name, cc.email
+-- FROM customer c
+-- JOIN customer_contact cc ON c.customer_id = cc.customer_id
+-- WHERE EXISTS (
+--     SELECT 1
+--     FROM transaction t
+--     JOIN distributor d ON t.distributor_id = d.distributor_id
+--     WHERE t.customer_id = c.customer_id
+--     AND d.state = 'NY'
+-- );
+
+
+-- -- 8. Retreiving data from Product Table where Distributor_id matches the required distributor
+-- -- then 
+-- -- Updating product data of selected product which belongs to 1 distributor
+-- SELECT product_id, name, description, quantity, price, Category
+-- FROM product
+-- WHERE distributor_id = 1;
+
+-- UPDATE product
+-- SET 
+--     price = 75
+-- WHERE
+--     product_id = 1
+--     AND distributor_id = 1;
+
+-- SELECT * FROM product;
+
+
+-- -- 9. Calculate total sales for products by Category
+-- SELECT SUM(t.quantity) AS total_sales
+-- FROM Transaction t
+-- JOIN Product p ON t.product_id = p.product_id
+-- WHERE p.Category = 'Category 1';
 
 
 
--- WRONG SQL queries for showing constraints 
-INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES(1, 1, 2,1);
-INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES(NULL, '123 Main St.', 'Anytown', 'CA', '12345', 'USA');
-UPDATE product
-SET price = null
-WHERE product_id = 1;
-
--- Correct SQL queries for showing constraints
-UPDATE product SET price = price * 1.1 WHERE name = 'Product 2';
-INSERT INTO product (distributor_id, name, description, quantity, price, Category)
-VALUES (1, 'Product 11', NULL, 50, 25, 'Category 1');
-
-
-SELECT * FROM customer;
-SELECT * FROM distributor;
-
--- DROP TABLE distributor_history;
--- DROP TABLE customer_history;
--- DROP TABLE transaction;
--- DROP TABLE cart;
--- DROP TABLE Feedback;
--- DROP TABLE inventory;
--- DROP TABLE product;
--- DROP TABLE customer_contact;
--- DROP TABLE customer;
--- DROP TABLE distributor_contact;
--- DROP TABLE distributor;
+-- -- 10. Retrieve the names and quantities of products purchased by customers who live in Texas (TX)
+-- SELECT p.name, t.quantity
+-- FROM product p
+-- JOIN transaction t ON p.product_id = t.product_id
+-- JOIN customer c ON t.customer_id = c.customer_id
+-- WHERE c.state = 'TX';
 
 
 
-START TRANSACTION;
+-- -- WRONG SQL queries for showing constraints 
+-- INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES(1, 1, 2,1);
+-- INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES(NULL, '123 Main St.', 'Anytown', 'CA', '12345', 'USA');
+-- UPDATE product
+-- SET price = null
+-- WHERE product_id = 1;
 
--- Insert into transaction table
-INSERT INTO transaction (product_id, customer_id, distributor_id, quantity)
-SELECT c.product_id, c.customer_id, c.distributor_id, c.quantity
-FROM cart c
-WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+-- -- Correct SQL queries for showing constraints
+-- UPDATE product SET price = price * 1.1 WHERE name = 'Product 2';
+-- INSERT INTO product (distributor_id, name, description, quantity, price, Category)
+-- VALUES (1, 'Product 11', NULL, 50, 25, 'Category 1');
 
--- Insert into customer_history table
-INSERT INTO customer_history (transaction_id, product_id, quantity, customer_id)
-SELECT t.transaction_id, t.product_id, t.quantity, t.customer_id
-FROM transaction t
-WHERE t.customer_id =1; -- Replace <customer_id> with the actual customer_id
 
--- Update product table to reduce quantity
-UPDATE product p
-INNER JOIN cart c ON p.product_id = c.product_id
-SET p.quantity = p.quantity - c.quantity
-WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+-- SELECT * FROM customer;
+-- SELECT * FROM distributor;
 
--- Update inventory table to reduce quantity
-UPDATE inventory i
-INNER JOIN cart c ON i.product_id = c.product_id AND i.distributor_id = c.distributor_id
-SET i.quantity = i.quantity - c.quantity
-WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+-- -- DROP TABLE distributor_history;
+-- -- DROP TABLE customer_history;
+-- -- DROP TABLE transaction;
+-- -- DROP TABLE cart;
+-- -- DROP TABLE Feedback;
+-- -- DROP TABLE inventory;
+-- -- DROP TABLE product;
+-- -- DROP TABLE customer_contact;
+-- -- DROP TABLE customer;
+-- -- DROP TABLE distributor_contact;
+-- -- DROP TABLE distributor;
 
-DELETE FROM cart
-WHERE customer_id = 1;
 
-COMMIT;
+
+-- START TRANSACTION;
+
+-- -- Insert into transaction table
+-- INSERT INTO transaction (product_id, customer_id, distributor_id, quantity)
+-- SELECT c.product_id, c.customer_id, c.distributor_id, c.quantity
+-- FROM cart c
+-- WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+
+-- -- Insert into customer_history table
+-- INSERT INTO customer_history (transaction_id, product_id, quantity, customer_id)
+-- SELECT t.transaction_id, t.product_id, t.quantity, t.customer_id
+-- FROM transaction t
+-- WHERE t.customer_id =1; -- Replace <customer_id> with the actual customer_id
+
+-- -- Update product table to reduce quantity
+-- UPDATE product p
+-- INNER JOIN cart c ON p.product_id = c.product_id
+-- SET p.quantity = p.quantity - c.quantity
+-- WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+
+-- -- Update inventory table to reduce quantity
+-- UPDATE inventory i
+-- INNER JOIN cart c ON i.product_id = c.product_id AND i.distributor_id = c.distributor_id
+-- SET i.quantity = i.quantity - c.quantity
+-- WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+
+-- DELETE FROM cart
+-- WHERE customer_id = 1;
+
+-- COMMIT;
 
 

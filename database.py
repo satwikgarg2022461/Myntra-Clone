@@ -8,8 +8,7 @@ encoded_password = urllib.parse.quote_plus("Satwik@07")
 connection_string = f"mysql+pymysql://root:{encoded_password}@localhost:3306/myntra"
 
 engine = create_engine(connection_string)
-
-def register(data,database):
+def register(data, database):
     with engine.connect() as conn:
         name = data.get("username")
         email = data.get("email")
@@ -25,30 +24,45 @@ def register(data,database):
             print("Error: Missing required fields.")
             return
 
+        # Insert data into customer table
+        query = text(f'INSERT INTO {database} (name, address_line1, city, state, postal_code, country) VALUES ("{name}", "{address_line1}", "{city}", "{state}", "{postal_code}", "{country}");')
+        result = conn.execute(query)
 
-        query = text(f'INSERT INTO {database} (name, address_line1, city, state, postal_code, country) VALUES (:name, :address_line1, :city, :state, :postal_code, :country)')
-        result = conn.execute(query, {'name': name, 'address_line1': address_line1, 'city': city, 'state': state, 'postal_code': postal_code, 'country': country})
+        # Retrieve the auto-generated customer_id
+        customer_id = result.lastrowid
+
+        # Insert data into customer_contact table
+        query = text(f'INSERT INTO {database}_contact ({database}_id, phone_number, email) VALUES ({customer_id}, {phone}, "{email}");')
+        conn.execute(query)
+
+        # Commit the transaction
         conn.commit()
+
+        # Print the updated customer table
         result1 = conn.execute(text("SELECT * FROM customer"))
         print(result1.fetchall())
 
 def login_check(data,database):
     with engine.connect() as conn:
+        
         name = data.get("username")
         email = data.get("email")
         query = text(f'SELECT c.{database}_id FROM {database} c JOIN {database}_contact cc ON c.{database}_id = cc.{database}_id WHERE c.name = "{name}" AND cc.email = "{email}";')
         result = conn.execute(query)
         conn.commit()
         fetched_result = result.fetchone()
+        print(fetched_result)
+        dispaly("customer")
         if fetched_result:
             database_id = fetched_result[0]
             return database_id
         else:
             return -1
 
-def dispaly():
+def dispaly(data):
+    print(data)
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM product"))
+        result = conn.execute(text(f'SELECT * FROM {data}'))
         print(result.fetchall())
 
 def product_list():
@@ -107,7 +121,7 @@ def add_product(data):
         query = text(f'INSERT INTO product (distributor_id, name, description, quantity, price, Category)VALUES ({distribution_id}, "{name}", "{description}", "{quantity}", "{price}", "{category}");')
         result = conn.execute(query)
         conn.commit()
-        dispaly()
+        dispaly("product")
 
 def fetch_inventory_data():
     with engine.connect() as conn:
@@ -285,16 +299,7 @@ def transaction():
         """)
         conn.execute(insert_transaction, {'customer_id': customer_id})
         conn.commit()
-
-        # INSERT INTO customer_history table
-        insert_customer_history = text("""
-            INSERT INTO customer_history (transaction_id, product_id, quantity, customer_id)
-            SELECT t.transaction_id, t.product_id, t.quantity, t.customer_id
-            FROM transaction t
-            WHERE t.customer_id = :customer_id
-        """)
-        conn.execute(insert_customer_history, {'customer_id': customer_id})
-        conn.commit()
+        dispaly("customer_history")
 
         # UPDATE product table
         update_product = text("""
@@ -317,17 +322,21 @@ def transaction():
         conn.commit()
 
         # DELETE FROM cart
-        delete_cart = text("""
-            DELETE FROM cart
-            WHERE customer_id = :customer_id
-        """)
-        conn.execute(delete_cart, {'customer_id': customer_id})
-        conn.commit()
+        try:
+            delete_cart = text("""
+                DELETE FROM cart
+                WHERE customer_id = :customer_id
+            """)
+            conn.execute(delete_cart, {'customer_id': customer_id})
+            conn.commit()
+        except:
+            print()
+
+        dispaly("cart")
 
 def remove_cart_item(product_id):
     with engine.connect() as conn:
         customer_id = get_customer_id()
-        
 
         # Check if the item exists in the cart
         existing_query = text(f'SELECT * FROM cart WHERE customer_id = {customer_id} AND product_id = {product_id};')
@@ -341,15 +350,13 @@ def remove_cart_item(product_id):
         delete_query = text(f'DELETE FROM cart WHERE customer_id = {customer_id} AND product_id = {product_id};')
         conn.execute(delete_query)
         conn.commit()
-    
+    dispaly("cart")
     return "Item removed from cart successfully."
 
 def add_product_to_cart(product_id, distribution_id, quantity):
     with engine.connect() as conn:
         customer_id = get_customer_id()  # Assuming you have a function to get customer ID
-        # product_id = int(data.get("product_id"))
-        # quantity = int(data.get("quantity"))
-        # distributor_id = int(data.get("distributor_id"))
+        
 
         # Check if the item already exists in the cart for the customer
         check_query = text(f"SELECT * FROM cart WHERE customer_id = {customer_id} AND product_id = {product_id}")
@@ -360,10 +367,14 @@ def add_product_to_cart(product_id, distribution_id, quantity):
             new_quantity = existing_item["quantity"] + quantity
             update_query = text(f"UPDATE cart SET quantity = {new_quantity} WHERE customer_id = {customer_id} AND product_id = {product_id};")
             conn.execute(update_query)
+            conn.commit()
         else:
             # Insert new item into the cart if it doesn't exist
             insert_query = text(f"INSERT INTO cart (customer_id, product_id, quantity, distributor_id) VALUES ({customer_id}, {product_id}, {quantity}, {distribution_id});")
             conn.execute(insert_query)
+            conn.commit()
+        
+        dispaly("cart")
 
         conn.commit()
 
@@ -379,6 +390,8 @@ def fetch_order_history():
         """)
         result = conn.execute(query)
         order_details = result.fetchall()
+        print(order_details)
+        
 
         # Convert the fetched data into a list of dictionaries
         order_list = []
@@ -391,6 +404,7 @@ def fetch_order_history():
                 'price': row[4]
             }
             order_list.append(order_dict)
+            print(order_list)
 
         return order_list
 
