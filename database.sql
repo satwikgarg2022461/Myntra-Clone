@@ -341,168 +341,245 @@ SELECT * FROM cart;
 
 
 
--- -- 1. Retrieve the names of customers who have purchased products with a price higher than $60
--- SELECT c.name
--- FROM customer c
--- WHERE EXISTS (
---     SELECT 1
---     FROM transaction t
---     JOIN product p ON t.product_id = p.product_id
---     WHERE t.customer_id = c.customer_id
---     AND p.price > 60
--- );
+-- 1. Retrieve the names of customers who have purchased products with a price higher than $60
+SELECT c.name
+FROM customer c
+WHERE EXISTS (
+    SELECT 1
+    FROM transaction t
+    JOIN product p ON t.product_id = p.product_id
+    WHERE t.customer_id = c.customer_id
+    AND p.price > 60
+);
 
 
--- -- 2. Retrieve the names and addresses of distributors who have sold more than 3 products in total
--- SELECT d.name, d.address_line1, d.city, d.state, d.postal_code, d.country
--- FROM distributor d
--- JOIN (
---     SELECT distributor_id, SUM(quantity) AS total_sold
---     FROM transaction
---     GROUP BY distributor_id
---     HAVING total_sold > 3
--- ) AS t ON d.distributor_id = t.distributor_id;
-
-
-
--- -- 3. Product with highest number of sales
--- SELECT p.name AS product_name, SUM(t.quantity) AS total_sales
--- FROM product p
--- JOIN transaction t ON p.product_id = t.product_id
--- GROUP BY p.product_id
--- ORDER BY total_sales DESC
--- LIMIT 1;
-
-
--- -- 4. Distributor with highest number of sales
--- SELECT d.name AS distributor_name, SUM(t.quantity) AS total_sales
--- FROM distributor d
--- JOIN transaction t ON d.distributor_id = t.distributor_id
--- GROUP BY d.distributor_id
--- ORDER BY total_sales DESC
--- LIMIT 1;
-
-
--- -- 5. Distributor with maximum stock
--- SELECT d.name AS distributor_name, SUM(i.quantity) AS total_stock
--- FROM distributor d
--- JOIN inventory i ON d.distributor_id = i.distributor_id
--- GROUP BY d.distributor_id
--- ORDER BY total_stock DESC
--- LIMIT 1;
-
--- -- 6. Reading feedback
--- SELECT f.*, p.name as product_name
--- FROM Feedback f
--- JOIN Product p ON f.product_id = p.product_id
--- WHERE p.distributor_id = 1;
-
--- -- 7. Retrieve the names and email addresses of customers who have purchased products from distributors in New York (NY)
--- SELECT c.name, cc.email
--- FROM customer c
--- JOIN customer_contact cc ON c.customer_id = cc.customer_id
--- WHERE EXISTS (
---     SELECT 1
---     FROM transaction t
---     JOIN distributor d ON t.distributor_id = d.distributor_id
---     WHERE t.customer_id = c.customer_id
---     AND d.state = 'NY'
--- );
-
-
--- -- 8. Retreiving data from Product Table where Distributor_id matches the required distributor
--- -- then 
--- -- Updating product data of selected product which belongs to 1 distributor
--- SELECT product_id, name, description, quantity, price, Category
--- FROM product
--- WHERE distributor_id = 1;
-
--- UPDATE product
--- SET 
---     price = 75
--- WHERE
---     product_id = 1
---     AND distributor_id = 1;
-
--- SELECT * FROM product;
-
-
--- -- 9. Calculate total sales for products by Category
--- SELECT SUM(t.quantity) AS total_sales
--- FROM Transaction t
--- JOIN Product p ON t.product_id = p.product_id
--- WHERE p.Category = 'Category 1';
+-- 2. Retrieve the names and addresses of distributors who have sold more than 3 products in total
+SELECT d.name, d.address_line1, d.city, d.state, d.postal_code, d.country
+FROM distributor d
+JOIN (
+    SELECT distributor_id, SUM(quantity) AS total_sold
+    FROM transaction
+    GROUP BY distributor_id
+    HAVING total_sold > 3
+) AS t ON d.distributor_id = t.distributor_id;
 
 
 
--- -- 10. Retrieve the names and quantities of products purchased by customers who live in Texas (TX)
--- SELECT p.name, t.quantity
--- FROM product p
--- JOIN transaction t ON p.product_id = t.product_id
--- JOIN customer c ON t.customer_id = c.customer_id
--- WHERE c.state = 'TX';
+-- 3. Product with highest number of sales
+SELECT p.name AS product_name, SUM(t.quantity) AS total_sales
+FROM product p
+JOIN transaction t ON p.product_id = t.product_id
+GROUP BY p.product_id
+ORDER BY total_sales DESC
+LIMIT 1;
+
+
+-- 4. Distributor with highest number of sales
+SELECT d.name AS distributor_name, SUM(t.quantity) AS total_sales
+FROM distributor d
+JOIN transaction t ON d.distributor_id = t.distributor_id
+GROUP BY d.distributor_id
+ORDER BY total_sales DESC
+LIMIT 1;
+
+
+-- 5. Distributor with maximum stock
+SELECT d.name AS distributor_name, SUM(i.quantity) AS total_stock
+FROM distributor d
+JOIN inventory i ON d.distributor_id = i.distributor_id
+GROUP BY d.distributor_id
+ORDER BY total_stock DESC
+LIMIT 1;
+
+-- 6. Reading feedback
+SELECT f.*, p.name as product_name
+FROM Feedback f
+JOIN Product p ON f.product_id = p.product_id
+WHERE p.distributor_id = 1;
+
+-- 7. Retrieve the names and email addresses of customers who have purchased products from distributors in New York (NY)
+SELECT c.name, cc.email
+FROM customer c
+JOIN customer_contact cc ON c.customer_id = cc.customer_id
+WHERE EXISTS (
+    SELECT 1
+    FROM transaction t
+    JOIN distributor d ON t.distributor_id = d.distributor_id
+    WHERE t.customer_id = c.customer_id
+    AND d.state = 'NY'
+);
+
+
+-- 8. Retreiving data from Product Table where Distributor_id matches the required distributor
+-- then 
+-- Updating product data of selected product which belongs to 1 distributor
+SELECT product_id, name, description, quantity, price, Category
+FROM product
+WHERE distributor_id = 1;
+
+UPDATE product
+SET 
+    price = 75
+WHERE
+    product_id = 1
+    AND distributor_id = 1;
+
+SELECT * FROM product;
+
+
+-- 9. Calculate total sales for products by Category
+SELECT SUM(t.quantity) AS total_sales
+FROM Transaction t
+JOIN Product p ON t.product_id = p.product_id
+WHERE p.Category = 'Category 1';
 
 
 
--- -- WRONG SQL queries for showing constraints 
--- INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES(1, 1, 2,1);
--- INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES(NULL, '123 Main St.', 'Anytown', 'CA', '12345', 'USA');
--- UPDATE product
--- SET price = null
--- WHERE product_id = 1;
-
--- -- Correct SQL queries for showing constraints
--- UPDATE product SET price = price * 1.1 WHERE name = 'Product 2';
--- INSERT INTO product (distributor_id, name, description, quantity, price, Category)
--- VALUES (1, 'Product 11', NULL, 50, 25, 'Category 1');
-
-
--- SELECT * FROM customer;
--- SELECT * FROM distributor;
-
--- -- DROP TABLE distributor_history;
--- -- DROP TABLE customer_history;
--- -- DROP TABLE transaction;
--- -- DROP TABLE cart;
--- -- DROP TABLE Feedback;
--- -- DROP TABLE inventory;
--- -- DROP TABLE product;
--- -- DROP TABLE customer_contact;
--- -- DROP TABLE customer;
--- -- DROP TABLE distributor_contact;
--- -- DROP TABLE distributor;
+-- 10. Retrieve the names and quantities of products purchased by customers who live in Texas (TX)
+SELECT p.name, t.quantity
+FROM product p
+JOIN transaction t ON p.product_id = t.product_id
+JOIN customer c ON t.customer_id = c.customer_id
+WHERE c.state = 'TX';
 
 
 
--- START TRANSACTION;
+-- WRONG SQL queries for showing constraints 
+INSERT INTO distributor_history (distributor_id, product_id, quantity, transaction_id) VALUES(1, 1, 2,1);
+INSERT INTO customer (name, address_line1, city, state, postal_code, country) VALUES(NULL, '123 Main St.', 'Anytown', 'CA', '12345', 'USA');
+UPDATE product
+SET price = null
+WHERE product_id = 1;
 
--- -- Insert into transaction table
--- INSERT INTO transaction (product_id, customer_id, distributor_id, quantity)
--- SELECT c.product_id, c.customer_id, c.distributor_id, c.quantity
--- FROM cart c
--- WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+-- Correct SQL queries for showing constraints
+UPDATE product SET price = price * 1.1 WHERE name = 'Product 2';
+INSERT INTO product (distributor_id, name, description, quantity, price, Category)
+VALUES (1, 'Product 11', NULL, 50, 25, 'Category 1');
 
--- -- Insert into customer_history table
--- INSERT INTO customer_history (transaction_id, product_id, quantity, customer_id)
--- SELECT t.transaction_id, t.product_id, t.quantity, t.customer_id
--- FROM transaction t
--- WHERE t.customer_id =1; -- Replace <customer_id> with the actual customer_id
 
--- -- Update product table to reduce quantity
--- UPDATE product p
--- INNER JOIN cart c ON p.product_id = c.product_id
--- SET p.quantity = p.quantity - c.quantity
--- WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+SELECT * FROM customer;
+SELECT * FROM distributor;
 
--- -- Update inventory table to reduce quantity
--- UPDATE inventory i
--- INNER JOIN cart c ON i.product_id = c.product_id AND i.distributor_id = c.distributor_id
--- SET i.quantity = i.quantity - c.quantity
--- WHERE c.customer_id = 1; -- Replace <customer_id> with the actual customer_id
+DROP TABLE distributor_history;
+DROP TABLE customer_history;
+DROP TABLE transaction;
+DROP TABLE cart;
+DROP TABLE Feedback;
+DROP TABLE inventory;
+DROP TABLE product;
+DROP TABLE customer_contact;
+DROP TABLE customer;
+DROP TABLE distributor_contact;
+DROP TABLE distributor;
 
--- DELETE FROM cart
--- WHERE customer_id = 1;
 
--- COMMIT;
+
+
+
+
+
+
+
+
+--Non-conflicting
+
+START TRANSACTION;
+-- Insert into transaction table
+INSERT INTO transaction (product_id, customer_id, distributor_id, quantity)
+SELECT c.product_id, c.customer_id, c.distributor_id, c.quantity
+FROM cart c
+WHERE c.customer_id = 1; 
+
+
+-- Update product table to reduce quantity
+UPDATE product p
+INNER JOIN cart c ON p.product_id = c.product_id
+SET p.quantity = p.quantity - c.quantity
+WHERE c.customer_id = 1; 
+
+-- Update inventory table to reduce quantity
+UPDATE inventory i
+INNER JOIN cart c ON i.product_id = c.product_id AND i.distributor_id = c.distributor_id
+SET i.quantity = i.quantity - c.quantity
+WHERE c.customer_id = 1; 
+
+--Deleting from cart
+DELETE FROM cart
+WHERE customer_id = 1;
+
+COMMIT;
+
+
+
+START TRANSACTION;
+
+UPDATE product
+SET price = 29
+WHERE product_id = 1; 
+
+COMMIT;
+
+
+START TRANSACTION;
+
+Select name 
+From customer
+Where customer_id = 1;
+
+COMMIT;
+
+
+
+START TRANSACTION;
+
+SET @customer_id = 1;     
+SET @product_id = 2;        
+SET @quantity_added = 1;    
+SET @distributor_id = 1;    
+
+UPDATE inventory
+SET quantity = quantity - @quantity_added
+WHERE product_id = @product_id AND distributor_id = @distributor_id;
+
+COMMIT;
+
+
+-- conflicting
+-- terminal 1
+START TRANSACTION;
+
+UPDATE product
+SET price = 29
+WHERE product_id = 1;
+
+--terminal 2
+START TRANSACTION;
+
+UPDATE product
+SET price = 25
+WHERE product_id = 1;
+
+COMMIT;
+
+
+
+
+-- conflicting
+-- terminal 1
+START TRANSACTION;
+
+UPDATE feedback
+SET review = "hi"
+WHERE product_id = 1;
+
+--terminal 2
+START TRANSACTION;
+
+UPDATE feedback
+SET review = "bye"
+WHERE product_id = 1;
+
+COMMIT;
+
 
 
