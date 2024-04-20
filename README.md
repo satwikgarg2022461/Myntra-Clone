@@ -1,6 +1,8 @@
 # Myntra-Clone
 # Myntra-Clone DBMS Project
 
+Video Demo Link -> https://drive.google.com/file/d/1Lao728vX5Li6oMq2nc9IyUZ6T0T8OMn5/view?usp=sharing
+
 ## Overview
 This project is a DBMS clone of Myntra, focusing on the core functionalities of an e-commerce fashion store. It allows users to interact with a system that supports customer and distributor activities.
 
